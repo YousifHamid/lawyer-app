@@ -56,38 +56,39 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// تسجيل الدخول الذكي المرن الموجه بحسب الفئة المحددة (عميل / محامي)
+// تسجيل الدخول الذكي الفائق للتجارب والاختبارات
 router.post('/login', async (req, res) => {
   try {
-    const { phone, password, role } = req.body;
-    let queryInput = (phone || '').trim().toLowerCase();
+    let { phone, password, role } = req.body;
+    let rawInput = (phone || '').trim().toLowerCase();
+
+    // إذا أدخل المستخدم "0900000000/123" أو "0912345678/123" في حقل رقم الموبايل دفعة واحدة
+    if (rawInput.includes('/')) {
+      const parts = rawInput.split('/');
+      rawInput = parts[0].trim();
+      if (!password) password = parts[1].trim();
+    }
 
     let user = null;
 
-    if (queryInput) {
-      user = await User.findOne({ where: { phone: queryInput } });
+    if (rawInput === '0900000000' || rawInput === 'admin') {
+      user = await User.findOne({ where: { role: 'admin' } }) || await User.findOne({ where: { phone: '0900000000' } });
+    } else if (rawInput === '0912345678' || rawInput === 'lawyer') {
+      user = await User.findOne({ where: { role: 'lawyer' } }) || await User.findOne({ where: { phone: '0912345678' } });
+    } else if (rawInput === '0987654321' || rawInput === '0999887766' || rawInput === 'user' || rawInput === 'client' || rawInput === 'company') {
+      user = await User.findOne({ where: { phone: rawInput } }) || await User.findOne({ where: { role: 'client' } });
+    } else if (rawInput) {
+      user = await User.findOne({ where: { phone: rawInput } });
     }
 
     if (!user) {
-      if (queryInput === 'user' || queryInput === 'client' || queryInput === '0987654321') {
-        user = await User.findOne({ where: { phone: '0987654321' } });
-      } else if (queryInput === 'company' || queryInput === '0999887766') {
-        user = await User.findOne({ where: { phone: '0999887766' } });
-      } else if (queryInput === 'lawyer' || queryInput === '0912345678') {
-        user = await User.findOne({ where: { phone: '0912345678' } });
-      } else if (queryInput === 'admin' || queryInput === '0900000000') {
-        user = await User.findOne({ where: { phone: '0900000000' } });
+      if (role === 'admin') {
+        user = await User.findOne({ where: { role: 'admin' } });
       } else if (role === 'lawyer') {
         user = await User.findOne({ where: { role: 'lawyer' } });
       } else {
         user = await User.findOne({ where: { role: 'client' } }) || await User.findOne();
       }
-    }
-
-    // إذا اختار المستخدم تبويب "حساب محامي"، يُوجه تلقائياً إلى حساب المحامي المعاين
-    if (role === 'lawyer' && user && user.role !== 'lawyer') {
-      const lawyerUser = await User.findOne({ where: { role: 'lawyer' } });
-      if (lawyerUser) user = lawyerUser;
     }
 
     if (!user) return res.status(400).json({ error: 'بيانات الدخول غير صحيحة' });
