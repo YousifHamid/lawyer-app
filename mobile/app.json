@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "محاميك",
+    "slug": "mohamik",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#0F6E56",
+    "splash": {
+      "backgroundColor": "#0F6E56",
+      "resizeMode": "contain"
+    },
+    "android": {
+      "package": "com.mohamik.mobile"
+    },
+    "ios": {
+      "bundleIdentifier": "com.mohamik.mobile"
+    }
+  }
+}

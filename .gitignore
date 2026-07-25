@@ -1,0 +1,15 @@
+# Node & Expo
+node_modules/
+.expo/
+dist/
+web-build/
+*.log
+
+# Databases & local env
+*.db
+*.sqlite
+.env
+
+# OS Files
+.DS_Store
+Thumbs.db
