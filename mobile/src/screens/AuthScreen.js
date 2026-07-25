@@ -11,7 +11,7 @@ const CLIENT_TYPES = [
 export default function AuthScreen() {
   const { login, register } = useContext(AuthContext);
 
-  const [role, setRole] = useState('client'); // client | lawyer
+  const [role, setRole] = useState('client'); // client | lawyer | admin
   const [mode, setMode] = useState('login'); // login | register
 
   const [name, setName] = useState('');
@@ -28,10 +28,16 @@ export default function AuthScreen() {
   async function handleSubmit() {
     setLoading(true);
     try {
+      const inputTrim = (phone || '').trim().toLowerCase();
+      let targetRole = role;
+      if (inputTrim === 'admin' || inputTrim === '0900000000') {
+        targetRole = 'admin';
+      }
+
       if (mode === 'login') {
-        await login(phone, password, role);
+        await login(phone, password, targetRole);
       } else {
-        await register({ name, phone, password, role, client_type: clientType, specialty, whatsapp });
+        await register({ name, phone, password, role: targetRole, client_type: clientType, specialty, whatsapp });
       }
     } catch (err) {
       Alert.alert('خطأ', err.response?.data?.error || 'حدث خطأ، حاول مرة أخرى');
@@ -129,7 +135,7 @@ export default function AuthScreen() {
       )}
       <TextInput
         style={styles.input}
-        placeholder="رقم الموبايل"
+        placeholder="رقم الموبايل (مثلاً: 0900000000 للأدمن)"
         placeholderTextColor="#9CA3AF"
         keyboardType="phone-pad"
         value={phone}
@@ -137,7 +143,7 @@ export default function AuthScreen() {
       />
       <TextInput
         style={styles.input}
-        placeholder="كلمة المرور"
+        placeholder="كلمة المرور (123/123)"
         placeholderTextColor="#9CA3AF"
         secureTextEntry
         value={password}
