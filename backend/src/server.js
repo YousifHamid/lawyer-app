@@ -17,6 +17,11 @@ app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/admin', express.static(path.join(__dirname, '../public/admin')));
+app.use('/public', express.static(path.join(__dirname, '../public')));
+
+// Privacy Policy & Terms of Service Routes for App Stores
+app.get('/privacy', (req, res) => res.sendFile(path.join(__dirname, '../public/privacy.html')));
+app.get('/terms', (req, res) => res.sendFile(path.join(__dirname, '../public/terms.html')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/lawyers', lawyerRoutes);
@@ -26,10 +31,16 @@ app.use('/api/regions', regionRoutes);
 app.use('/api/admin', adminRoutes);
 
 app.get('/dashboard', (req, res) => res.redirect('/admin'));
-app.get('/', (req, res) => res.json({ status: 'ok', message: 'Lawyer App API 2026', adminUrl: 'http://localhost:4000/admin' }));
+app.get('/', (req, res) => res.json({
+  status: 'ok',
+  message: 'Lawyer App API 2026',
+  adminUrl: 'http://localhost:4000/admin',
+  privacyUrl: 'http://localhost:4000/privacy',
+  termsUrl: 'http://localhost:4000/terms'
+}));
 
 const PORT = process.env.PORT || 4000;
 
 sequelize.sync().then(() => {
-  app.listen(PORT, () => console.log(`Server running on port ${PORT} - Admin Web Dashboard: http://localhost:${PORT}/admin`));
+  app.listen(PORT, () => console.log(`Server running on port ${PORT} - Admin: http://localhost:${PORT}/admin | Privacy: http://localhost:${PORT}/privacy`));
 });
