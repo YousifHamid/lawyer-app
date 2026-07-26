@@ -18,8 +18,6 @@ import ManageServicesScreen from '../screens/lawyer/ManageServicesScreen';
 import IncomingRequestsScreen from '../screens/lawyer/IncomingRequestsScreen';
 import EditProfileScreen from '../screens/lawyer/EditProfileScreen';
 
-import AdminDashboardScreen from '../screens/admin/AdminDashboardScreen';
-
 const Stack = createNativeStackNavigator();
 
 const defaultScreenOptions = {
@@ -67,14 +65,6 @@ function LawyerStack() {
   );
 }
 
-function AdminStack() {
-  return (
-    <Stack.Navigator screenOptions={defaultScreenOptions}>
-      <Stack.Screen name="AdminDashboard" component={AdminDashboardScreen} options={{ headerShown: false }} />
-    </Stack.Navigator>
-  );
-}
-
 export default function AppNavigator() {
   const { user, loading } = useContext(AuthContext);
   const [showSplash, setShowSplash] = useState(true);
@@ -93,15 +83,7 @@ export default function AppNavigator() {
 
   return (
     <NavigationContainer>
-      {!user ? (
-        <AuthStack />
-      ) : user.role === 'admin' ? (
-        <AdminStack />
-      ) : user.role === 'lawyer' ? (
-        <LawyerStack />
-      ) : (
-        <ClientStack />
-      )}
+      {!user ? <AuthStack /> : user.role === 'lawyer' ? <LawyerStack /> : <ClientStack />}
     </NavigationContainer>
   );
 }

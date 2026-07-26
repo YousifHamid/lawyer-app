@@ -16,6 +16,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/admin', express.static(path.join(__dirname, '../public/admin')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/lawyers', lawyerRoutes);
@@ -24,10 +25,11 @@ app.use('/api/requests', requestRoutes);
 app.use('/api/regions', regionRoutes);
 app.use('/api/admin', adminRoutes);
 
-app.get('/', (req, res) => res.json({ status: 'ok', message: 'Lawyer App API' }));
+app.get('/dashboard', (req, res) => res.redirect('/admin'));
+app.get('/', (req, res) => res.json({ status: 'ok', message: 'Lawyer App API 2026', adminUrl: 'http://localhost:4000/admin' }));
 
 const PORT = process.env.PORT || 4000;
 
 sequelize.sync().then(() => {
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  app.listen(PORT, () => console.log(`Server running on port ${PORT} - Admin Web Dashboard: http://localhost:${PORT}/admin`));
 });
